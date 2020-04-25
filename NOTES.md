@@ -507,3 +507,74 @@ export const fetchTodos = () => {
 };
 ```
 
+## A Reducer with Enums
+
+We export the interfaces from actions:
+
+```ts
+// actions/index.ts
+
+export interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+export interface FetchTodosAction {
+  type: ActionTypes.fetchTodos;
+  payload: Todo[];
+}
+```
+
+And start using them in a reducer
+
+```ts
+// reducers/todos.ts
+
+import { Todo } from "../actions";
+
+export const todosReducer = (state: Todo[]) => {};
+```
+
+So here the default state is going to be of type Todo-array. This is only specifying the annotation of state,
+we still need to provide some default value for it. To provide a default value for an argument at the same time
+we do a type annotation, we just put the default value after it:
+
+```ts
+(state: Todo[] = [])
+```
+
+Next is adding the action, for which we defined the structure we expect in the `FetchTodosAction`:
+
+```ts
+import { Todo, FetchTodosAction } from "../actions";
+
+export const todosReducer = (
+  state: Todo[] = [],
+  action: FetchTodosAction
+) => {};
+```
+
+But this says this will be alwasy a FetchTodo action! It's not so reusable yet, we'll get back to it.
+
+```ts
+import { Todo, FetchTodosAction } from "../actions";
+import { ActionTypes } from "../actions/types";
+
+export const todosReducer = (state: Todo[] = [], action: FetchTodosAction) => {
+  switch (action.type) {
+    case ActionTypes.fetchTodos:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+```
+
+However our TS code is kiinda lying to us at this point in time. When redux boots up, it sends warming up
+actions to the reducers. It sends a couple of action objects that has randomized types on them to test that
+none of our reducers responds incorrectly to an action, and to get the initial default value of state (our
+case its an empty []). So redux dispatches its own action, but at present we applied `FetchTodosAction`to our action,
+which is somewhat incorrect. We are saying that this action will always be type of `FetchTodosAction`, but
+that's not super accurate because redux will use different actions automatically by itself.
+We handle those in our `switch case/default`.
