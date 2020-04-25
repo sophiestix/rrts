@@ -858,3 +858,38 @@ export const todosReducer = (state: Todo[] = [], action: Action) => {
   }
 };
 ```
+
+## Type Guards in Reducers
+
+A `switch` statement acts like a type guard:
+
+```ts
+switch (action.type) {
+  case ActionTypes.fetchTodos:
+    return action.payload;
+  case ActionTypes.deleteTodo:
+    action;
+  default:
+    return state;
+}
+```
+
+Here `action` would only show `Action` as a type, which could be either `FetchTodosAction` or `DeleteTodoAction`, but
+the `switch` reduces the number of cases inside our type union. So above looking at the first `action` above
+the `switch` would give us `type Action`, but inside the case it would give `DeleteTodoAction`. We
+setup an implicit type guard here.
+
+```ts
+import { Todo, Action, ActionTypes } from "../actions";
+
+export const todosReducer = (state: Todo[] = [], action: Action) => {
+  switch (action.type) {
+    case ActionTypes.fetchTodos:
+      return action.payload;
+    case ActionTypes.deleteTodo:
+      return state.filter((todo: Todo) => todo.id !== action.payload);
+    default:
+      return state;
+  }
+};
+```
