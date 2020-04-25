@@ -377,3 +377,80 @@ export const fetchTodos = () => {
   };
 };
 ```
+
+## Action Types Enum
+
+We start with applying a type to the response data we get back from the api request by creating an interface
+for a todo object.
+
+`get` is also a generic function, so TS assumes we get back `any`. Let's help TS out:
+
+```ts
+const response = await axios.get<Todo[]>(url);
+```
+
+Create an enum for all the `type` we have in the application. `type` in redux means the type an action object has.
+
+```ts
+// actions/types.ts
+
+export enum ActionTypes {
+  fetchTodos,
+}
+```
+
+This is the equivalent of
+
+```ts
+export enum ActionTypes {
+  fetchTodos = "fetchtodos",
+}
+```
+
+but we don't need to write it out with an enum.
+
+So if we leave it off, TS will assign a number to it, starting with 0, so it assigns something unique for us. Helpful!
+
+```ts
+export enum ActionTypes {
+  fetchTodos = 0,
+  alsdf = 1,
+  djgfd = 2,
+}
+```
+
+Use it in the action:
+
+```ts
+import { ActionTypes } from "./types";
+
+dispatch({
+  type: ActionTypes.fetchTodos,
+  payload: response.data,
+});
+```
+
+```ts
+import axios from "axios";
+import { Dispatch } from "redux";
+import { ActionTypes } from "./types";
+
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+const url = "https://jsonplaceholder.typeicode.com/todos";
+
+export const fetchTodos = () => {
+  return async (dispatch: Dispatch) => {
+    const response = await axios.get<Todo[]>(url);
+
+    dispatch({
+      type: ActionTypes.fetchTodos,
+      payload: response.data,
+    });
+  };
+};
+```
