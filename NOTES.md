@@ -711,7 +711,7 @@ const mapStateToProps = ({ todos }: StoreState): { todos: Todo[] } => {
 };
 ```
 
-We wire everything together with `connect`, but first need to remove the `export` from the `class App` 
+We wire everything together with `connect`, but first need to remove the `export` from the `class App`
 and rename it to `_App`. We are exporting the connected component in the end instead:
 
 ```tsx
