@@ -116,7 +116,7 @@ Property 'counter' does not exist on type 'Readonly<{}>'.ts(2339)
 ```
 
 By looking at the base code for `React.Component`, we are missing the second generic `S` argument:
-```
+```tsx
  // Base component for plain JS classes
     // tslint:disable-next-line:no-empty-interface
     interface Component<P = {}, S = {}, SS = any> extends ComponentLifecycle<P, S, SS> { }
@@ -234,3 +234,58 @@ const App = (props: AppProps): JSX.Element => {
 ReactDOM.render(<App color="red" />, document.querySelector("#root"));
 ```
 
+## Redux Setup
+
+```
+➜  rrts git:(master) ✗ yarn add redux react-redux axios redux-thunk  
+```
+
+Need to install type definitions as well:
+```
+yarn add @types/react-redux
+```
+
+Create scaffolding
+
+```tsx
+// index.tsx
+
+import React from "react";
+import ReactDOM from "react-dom";
+import { createStore, applyMiddleware } from "redux";
+import { Provider } from "react-redux";
+import thunk from "redux-thunk";
+import { App } from "./components/App";
+import { reducers } from "./reducers";
+
+const store = createStore(reducers, applyMiddleware(thunk));
+
+ReactDOM.render(
+  <Provider store={store}>
+    <App />
+  </Provider>,
+  document.querySelector("#root")
+);
+```
+
+```ts
+// reducers/index.ts
+
+import { combineReducers } from "redux";
+
+export const reducers = combineReducers({
+  counter: () => 1,
+});
+```
+
+```tsx
+// components/App.tsx
+
+import React from "react";
+
+export class App extends React.Component {
+  render() {
+    return <div>Hi there</div>;
+  }
+}
+```
