@@ -624,5 +624,86 @@ So TS is making sure that our whatever our reducer is actually doing is lining u
 our `StoreState` to be. This mean whenever we are returning something that doesn't match, it will be
 caught inside this file as an error. Helpful!
 
-It's worth starting to look at the `StoreState` interfaces first, to see what the store look like when 
+It's worth starting to look at the `StoreState` interfaces first, to see what the store look like when
 implementing a new feauter in someone else's codebase.
+
+## Connecting a Component to Redux
+
+Firstly we need to make sure our App component has access to the fetch todos action creator. Then
+we make sure we have a `mapStateToProps` function that can take a list of todos from our redux store
+and provide them to the App component as props.
+
+```tsx
+import React from "react";
+import { connect } from "react-redux";
+import { Todo, fetchTodos } from "../actions";
+import { StoreState } from "../reducers";
+
+interface AppProps {
+  todos: Todo[];
+  fetchTodos(): any; // we'll come back to this
+}
+export class App extends React.Component {
+  render() {
+    return <div>Hi there</div>;
+  }
+}
+```
+
+We'll wire this up to our component with the generic `Component`.
+
+```tsx
+export class App extends React.Component<AppProps> {
+  render() {
+    return <div>Hi there</div>;
+  }
+}
+```
+
+Then mapping the state to props. We have the state that we type-check with the `StoreState`, and we know
+it will return an object with todos inside, and the todos will be of type `Todo[]`:
+
+```ts
+(state: StoreState): { todos: Todo[]}
+```
+
+So together:
+
+```ts
+const mapStateToProps = (state: StoreState): { todos: Todo[] } => {
+  return { todos: state.todos };
+};
+```
+
+We can also desctructure it:
+
+```ts
+const mapStateToProps = ({ todos }: StoreState): { todos: Todo[] } => {
+  return { todos };
+};
+```
+
+We wire everything together with `connect`:
+
+```tsx
+import React from "react";
+import { connect } from "react-redux";
+import { Todo, fetchTodos } from "../actions";
+import { StoreState } from "../reducers";
+
+interface AppProps {
+  todos: Todo[];
+  fetchTodos(): any; // we'll come back to this
+}
+class _App extends React.Component<AppProps> {
+  render() {
+    return <div>Hi there</div>;
+  }
+}
+
+const mapStateToProps = ({ todos }: StoreState): { todos: Todo[] } => {
+  return { todos };
+};
+
+export const App = connect(mapStateToProps, { fetchTodos })(_App);
+```
