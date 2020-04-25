@@ -801,3 +801,60 @@ Move things from index to `todos.ts` and have the `index.ts` like this:
 export * from "./todos";
 export * from "./types";
 ```
+
+## Expressing Actions as Type Union
+
+We want to add the new delete action to the reducer. This is not the best way:
+
+```ts
+// reducers/todo.ts
+
+import {
+  Todo,
+  FetchTodosAction,
+  DeleteTodoAction,
+  ActionTypes,
+} from "../actions";
+
+export const todosReducer = (
+  state: Todo[] = [],
+  action: FetchTodosAction | DeleteTodoAction
+) => {
+  switch (action.type) {
+    case ActionTypes.fetchTodos:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+```
+
+Instead do this:
+
+```ts
+// actions/types.ts
+
+import { FetchTodosAction, DeleteTodoAction } from "./todos";
+
+export enum ActionTypes {
+  fetchTodos,
+  deleteTodo,
+}
+
+export type Action = FetchTodosAction | DeleteTodoAction;
+```
+
+```ts
+// reducers/todos.ts
+
+import { Todo, Action, ActionTypes } from "../actions";
+
+export const todosReducer = (state: Todo[] = [], action: Action) => {
+  switch (action.type) {
+    case ActionTypes.fetchTodos:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+```
