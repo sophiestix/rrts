@@ -578,3 +578,51 @@ case its an empty []). So redux dispatches its own action, but at present we app
 which is somewhat incorrect. We are saying that this action will always be type of `FetchTodosAction`, but
 that's not super accurate because redux will use different actions automatically by itself.
 We handle those in our `switch case/default`.
+
+## Validating Store Structure
+
+In reducers/index, we combine:
+
+```ts
+import { combineReducers } from "redux";
+import { todosReducer } from "./todos";
+
+export const reducers = combineReducers({
+  todos: todosReducer,
+});
+```
+
+This will mean that in our state, we'll have:
+
+```ts
+{
+  todos: [Todo, Todo, Todo];
+}
+```
+
+`combineReducers` is also a generic function, so we can pass in a type or interface to validate the object.
+
+```ts
+import { combineReducers } from "redux";
+import { todosReducer } from "./todos";
+import { Todo } from "../actions";
+
+// interface to describe the entire state of my entire store
+export interface StoreState {
+  todos: Todo[];
+}
+
+export const reducers = combineReducers<StoreState>({
+  todos: todosReducer,
+});
+```
+
+TS is taking a look at the object that we are now passing into `combineReducers`. It's going to take a look
+at all the different properties and then for each reducer we pass in (e.g. `todos: todosRecuder`) checks if
+the function we pass in returns a value of type `Todo[]` as we defined in the `StoreState` interface.
+So TS is making sure that our whatever our reducer is actually doing is lining up with what we want
+our `StoreState` to be. This mean whenever we are returning something that doesn't match, it will be
+caught inside this file as an error. Helpful!
+
+It's worth starting to look at the `StoreState` interfaces first, to see what the store look like when 
+implementing a new feauter in someone else's codebase.
