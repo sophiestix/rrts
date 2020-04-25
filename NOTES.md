@@ -909,6 +909,7 @@ interface AppProps {
   fetchTodos: typeof fetchTodos;
   deleteTodo: typeof deleteTodo;
 }
+
 class _App extends React.Component<AppProps> {
   onButtonClick = (): void => {
     this.props.fetchTodos();
@@ -960,4 +961,47 @@ Argument of type 'typeof _App' is not assignable to parameter of type 'Component
     43 |
   > 44 | export const App = connect(mapStateToProps, { fetchTodos, deleteTodo })(_App);
        |
+```
+
+## Again, Type Definition Files
+
+The `connect` functione expexts an object as second argument, that will have a bunch of action creators
+inside of it. The problem in react-redux says `connect` thinks that an action creator is a function
+that returns an object and nothing else. In our error we see:
+
+```
+Type 'Promise<void>' provides no match for the signature '(dispatch: Dispatch<AnyAction>): Promise<void>'.  TS2345
+```
+
+The issue is that here we use redux-thunk with `fetchTodos`:
+
+```ts
+interface AppProps {
+  todos: Todo[];
+  fetchTodos: typeof fetchTodos;
+  deleteTodo: typeof deleteTodo;
+}
+```
+
+`fetchTodos` is a redux-thunk type action creator, it does not return a normal action object, instead it returns
+a function that is going to eventually dispatch an action.
+
+```ts
+(alias) const fetchTodos: () => (dispatch: Dispatch<AnyAction>) => Promise<void>
+```
+
+If we compare it to `deleteTodo`:
+
+```ts
+(alias) const deleteTodo: (id: number) => DeleteTodoAction
+```
+
+There's no easy work around for this problem. So for now we can do this:
+
+```ts
+interface AppProps {
+  todos: Todo[];
+  fetchTodos: Function;
+  deleteTodo: typeof deleteTodo;
+}
 ```
