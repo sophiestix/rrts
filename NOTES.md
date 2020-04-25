@@ -753,3 +753,37 @@ class _App extends React.Component<AppProps> {
   }
 }
 ```
+
+## Adding in Delete Functionality
+
+We could delete an item from the list by clicking on it.
+
+We are going to wire up an action, an action creator, modifying our reducer and an attachment our action
+creator back to our app component. So it's the entire usual redux flow.
+
+```ts
+// actions/types.ts
+
+export enum ActionTypes {
+  fetchTodos,
+  deleteTodo,
+}
+```
+
+Then we create an interface and an action creator. There's no need for async in this case:
+
+```ts
+// actions/index.ts
+
+export interface DeleteTodoAction {
+  type: ActionTypes.deleteTodo;
+  payload: number; // id of the Todo to be deleted
+}
+
+export const deleteTodo = (id: number): DeleteTodoAction => {
+  return {
+    type: ActionTypes.deleteTodo,
+    payload: id,
+  };
+};
+```
