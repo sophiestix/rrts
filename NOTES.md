@@ -454,3 +454,56 @@ export const fetchTodos = () => {
   };
 };
 ```
+
+## The Generic Dispatch Function
+
+An optional step, but recommended.
+
+We are adding another interface to describe the action object in the dispatch function.
+
+```ts
+interface FetchTodosAction {
+  type: ActionTypes.fetchTodos;
+  payload: Todo[];
+}
+
+dispatch<FetchTodosAction>({
+  type: ActionTypes.fetchTodos,
+  payload: response.data,
+});
+```
+
+After a time the action creators can get complex with lots of requests maybe or other logic inside.
+Adding this type check to the dispatch will make sure that we are always passing in an object with the
+correct types and properties.
+
+```ts
+import axios from "axios";
+import { Dispatch } from "redux";
+import { ActionTypes } from "./types";
+
+interface Todo {
+  id: number;
+  title: string;
+  completed: boolean;
+}
+
+interface FetchTodosAction {
+  type: ActionTypes.fetchTodos;
+  payload: Todo[];
+}
+
+const url = "https://jsonplaceholder.typeicode.com/todos";
+
+export const fetchTodos = () => {
+  return async (dispatch: Dispatch) => {
+    const response = await axios.get<Todo[]>(url);
+
+    dispatch<FetchTodosAction>({
+      type: ActionTypes.fetchTodos,
+      payload: response.data,
+    });
+  };
+};
+```
+
