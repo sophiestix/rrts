@@ -1,5 +1,7 @@
 # Notes
 
+use node v10.13.0
+
 ## Create-react-app & Simple Components
 
 ```tsx
@@ -786,4 +788,16 @@ export const deleteTodo = (id: number): DeleteTodoAction => {
     payload: id,
   };
 };
+```
+
+## Breaking out Action Creators
+
+By using TS in our actions files, it will get pretty long. We can break it up into separate files and use
+index.ts as a barrel file.
+
+Move things from index to `todos.ts` and have the `index.ts` like this:
+
+```ts
+export * from "./todos";
+export * from "./types";
 ```
