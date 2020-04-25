@@ -1,6 +1,32 @@
 # Notes
 
+```
 use node v10.13.0
+```
+
+## Table of Contents
+
+- Create-react-app & Simple Components
+- Interfaces with Props
+- Handling Component State
+- Confusing Component State!
+- Functional Component
+- Redux Setup
+- Action Creators with TypeScript
+- Action Types Enum
+- The Generic Dispatch Function
+- A Reducer with Enums
+- Validating Store Structure
+- Connecting a Component to Redux
+- Rendering a List
+- Adding in Delete Functionality
+- Breaking out Action Creators
+- Expressing Actions as Type Union
+- Type Guards in Reducers
+- Wiring up deleteTodo Action
+- Again, Type Definition Files
+- Tracking Loading with Component State
+- App Wrapup
 
 ## Create-react-app & Simple Components
 
@@ -1044,3 +1070,7 @@ class _App extends React.Component<AppProps, AppState> {
   }
 }
 ```
+
+## App Wrapup
+
+- Use `enum` for `ActionTypes` as opposed to the redux's documentation's recommendation.
