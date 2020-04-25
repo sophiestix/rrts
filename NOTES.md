@@ -493,7 +493,7 @@ interface FetchTodosAction {
   payload: Todo[];
 }
 
-const url = "https://jsonplaceholder.typeicode.com/todos";
+const url = "https://jsonplaceholder.typicode.com/todos";
 
 export const fetchTodos = () => {
   return async (dispatch: Dispatch) => {
@@ -706,4 +706,50 @@ const mapStateToProps = ({ todos }: StoreState): { todos: Todo[] } => {
 };
 
 export const App = connect(mapStateToProps, { fetchTodos })(_App);
+```
+
+## Rendering a List
+
+Let's test the api call, see it in the Network tab in the console:
+
+```tsx
+componentDidMount() {
+    this.props.fetchTodos()
+  }
+```
+
+We need to make sure to store the response from the api in the store.
+
+We need to refactor App, add a button that call the action creator and add method to create the List.
+This render method will return an array of `JSX.Elements` for us:
+
+```tsx
+renderList(): JSX.Element[] {
+    return this.props.todos.map((todo: Todo) => {
+      return <div key={todo.id}>{todo.title}</div>;
+    });
+  }
+```
+
+```tsx
+class _App extends React.Component<AppProps> {
+  onButtonClick = (): void => {
+    this.props.fetchTodos();
+  };
+
+  renderList(): JSX.Element[] {
+    return this.props.todos.map((todo: Todo) => {
+      return <div key={todo.id}>{todo.title}</div>;
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <button onClick={this.onButtonClick}>Fetch</button>
+        {this.renderList()}
+      </div>
+    );
+  }
+}
 ```
