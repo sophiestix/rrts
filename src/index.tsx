@@ -27,4 +27,4 @@ class App extends React.Component<AppProps> {
   }
 }
 
-ReactDOM.render(<App />, document.querySelector("#root"));
+ReactDOM.render(<App color="red" />, document.querySelector("#root"));

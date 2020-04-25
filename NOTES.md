@@ -214,3 +214,23 @@ Property 'state' in type 'App' is not assignable to the same property in base ty
 
 DON'T MIX THEM! 
 
+## Functional Component
+
+As much as possible we don't want to rely on type inference with functional components. It is recommended 
+to annotate the return type instead. Here we pass in props, that has the `AppProps` annotation, and 
+want to return a `JSX.Element`, so we add a return type annotation too:
+
+```tsx
+const App = (props: AppProps): JSX.Element => {
+  ...
+};
+```
+
+```tsx
+const App = (props: AppProps): JSX.Element => {
+  return <div>{props.color}</div>;
+};
+
+ReactDOM.render(<App color="red" />, document.querySelector("#root"));
+```
+
