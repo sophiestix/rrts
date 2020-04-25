@@ -893,3 +893,71 @@ export const todosReducer = (state: Todo[] = [], action: Action) => {
   }
 };
 ```
+
+## Wiring up deleteTodo Action
+
+We add it to App.tsx:
+
+```tsx
+import React from "react";
+import { connect } from "react-redux";
+import { Todo, fetchTodos, deleteTodo } from "../actions";
+import { StoreState } from "../reducers";
+
+interface AppProps {
+  todos: Todo[];
+  fetchTodos: typeof fetchTodos;
+  deleteTodo: typeof deleteTodo;
+}
+class _App extends React.Component<AppProps> {
+  onButtonClick = (): void => {
+    this.props.fetchTodos();
+  };
+
+  onTodoClick = (id: number): void => {
+    this.props.deleteTodo(id);
+  };
+
+  renderList(): JSX.Element[] {
+    return this.props.todos.map((todo: Todo) => {
+      return (
+        <div onClick={() => this.onTodoClick(todo.id)} key={todo.id}>
+          {todo.title}
+        </div>
+      );
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <button onClick={this.onButtonClick}>Fetch</button>
+        {this.renderList()}
+      </div>
+    );
+  }
+}
+
+const mapStateToProps = ({ todos }: StoreState): { todos: Todo[] } => {
+  return { todos };
+};
+
+export const App = connect(mapStateToProps, { fetchTodos, deleteTodo })(_App);
+```
+
+This will give us an error that we solve in the next section.
+
+```
+Argument of type 'typeof _App' is not assignable to parameter of type 'ComponentType<Matching<{ todos: Todo[]; } & { fetchTodos: () => Promise<void>; deleteTodo: (id: number) => DeleteTodoAction; }, AppProps>>'.
+  Type 'typeof _App' is not assignable to type 'ComponentClass<Matching<{ todos: Todo[]; } & { fetchTodos: () => Promise<void>; deleteTodo: (id: number) => DeleteTodoAction; }, AppProps>, any>'.
+    Types of parameters 'props' and 'props' are incompatible.
+      Type 'Matching<{ todos: Todo[]; } & { fetchTodos: () => Promise<void>; deleteTodo: (id: number) => DeleteTodoAction; }, AppProps>' is not assignable to type 'Readonly<AppProps>'.
+        The types returned by 'fetchTodos(...)' are incompatible between these types.
+          Type 'Promise<void>' is not assignable to type '(dispatch: Dispatch<AnyAction>) => Promise<void>'.
+            Type 'Promise<void>' provides no match for the signature '(dispatch: Dispatch<AnyAction>): Promise<void>'.  TS2345
+
+    42 | };
+    43 |
+  > 44 | export const App = connect(mapStateToProps, { fetchTodos, deleteTodo })(_App);
+       |
+```
