@@ -167,16 +167,16 @@ class App extends React.Component<AppProps> {
   state = { counter: 0 };
 ```
 
-We overwrote or redefined the `state: Readonly<S>;` in the original class `React.Component` we were
-`extending` on in our subclass App. So that's why it worked.
+We overwrote or redefined the `state: Readonly<S>;` in the original class `React.Component` because we were
+`extending` on `React.Component` in our subclass `App`. So that's why it worked.
 
 But when we have it in a `constructor`, `this.state` is understood by TS to be the empty object: `state: Readonly<S>;`.
-In this case we are not trying to define or override this property, we are trying to re-sign a new value to it.
+In this case we are not trying to define or override this property, we are trying to re-assign a new value to it.
 
 In the world of JS, this two would be the same and would behave the same, but not in the world of TS!
 They are two very different statements and will have two very different impacts.
 
-(TODO: ask for guidelines from the team)
+(TODO: ask for preference from the team)
 
 Let's pass in `AppState` interface then:
 
@@ -269,7 +269,7 @@ ReactDOM.render(<App color="red" />, document.querySelector("#root"));
 ## Redux Setup
 
 ```
-➜  rrts git:(master) ✗ yarn add redux react-redux axios redux-thunk
+yarn add redux react-redux axios redux-thunk
 ```
 
 Need to install type definitions as well:
@@ -325,7 +325,7 @@ export class App extends React.Component {
 
 ## Action Creators with TypeScript
 
-Let's use axios to make a get request to this url: `https://jsonplaceholder.typeicode.com/todos`.
+Let's use `axios` to make a `get` request to this url: `https://jsonplaceholder.typicode.com/todos`.
 
 We need to dispatch an action from an action creator. We are making a network request which means this
 will be an async action creator. That means we have to make use of redux-thunk. So rather then returning
@@ -383,7 +383,7 @@ export interface Dispatch<A extends Action = AnyAction> {
 
 So far it looks like JS, there's no type safety. E.g. we get a `response` but we have no idea of the
 structure of the data returned to us. We also have a hard coded string `FETCH_TODOS` for the `type`.
-Maybe an enum to store our action types?
+Maybe an enum to store our action types could be the solution?
 
 Also the dispatch function is a generic function, so we have plenty of structure there if we investigate it
 by hovering on it.
@@ -599,7 +599,7 @@ export const todosReducer = (state: Todo[] = [], action: FetchTodosAction) => {
 };
 ```
 
-However our TS code is kiinda lying to us at this point in time. When redux boots up, it sends warming up
+However our TS code is kiinda lying to us at this point in time. When redux boots up, it sends warm up
 actions to the reducers. It sends a couple of action objects that has randomized types on them to test that
 none of our reducers responds incorrectly to an action, and to get the initial default value of state (our
 case its an empty []). So redux dispatches its own action, but at present we applied `FetchTodosAction`to our action,
@@ -609,7 +609,7 @@ We handle those in our `switch case/default`.
 
 ## Validating Store Structure
 
-In reducers/index, we combine:
+In `reducers/index.ts`, we combine:
 
 ```ts
 import { combineReducers } from "redux";
@@ -624,7 +624,7 @@ This will mean that in our state, we'll have:
 
 ```ts
 {
-  todos: [Todo, Todo, Todo];
+  todos: [Todo, Todo, Todo, ...etc];
 }
 ```
 
@@ -648,12 +648,12 @@ export const reducers = combineReducers<StoreState>({
 TS is taking a look at the object that we are now passing into `combineReducers`. It's going to take a look
 at all the different properties and then for each reducer we pass in (e.g. `todos: todosRecuder`) checks if
 the function we pass in returns a value of type `Todo[]` as we defined in the `StoreState` interface.
-So TS is making sure that our whatever our reducer is actually doing is lining up with what we want
-our `StoreState` to be. This mean whenever we are returning something that doesn't match, it will be
+So TS is making sure that whatever our reducer is actually doing is lining up with what we want
+our `StoreState` to be. This means whenever we are returning something that doesn't match, it will be
 caught inside this file as an error. Helpful!
 
 It's worth starting to look at the `StoreState` interfaces first, to see what the store look like when
-implementing a new feauter in someone else's codebase.
+implementing a new feature in someone else's codebase to get an idea of the store.
 
 ## Connecting a Component to Redux
 
@@ -711,7 +711,8 @@ const mapStateToProps = ({ todos }: StoreState): { todos: Todo[] } => {
 };
 ```
 
-We wire everything together with `connect`:
+We wire everything together with `connect`, but first need to remove the `export` from the `class App` 
+and rename it to `_App`. We are exporting the connected component in the end instead:
 
 ```tsx
 import React from "react";
@@ -748,7 +749,7 @@ componentDidMount() {
 
 We need to make sure to store the response from the api in the store.
 
-We need to refactor App, add a button that call the action creator and add method to create the List.
+We need to refactor App, add a button that calls the action creator and add a method to create the List.
 This render method will return an array of `JSX.Elements` for us:
 
 ```tsx
@@ -991,8 +992,8 @@ Argument of type 'typeof _App' is not assignable to parameter of type 'Component
 
 ## Again, Type Definition Files
 
-The `connect` functione expexts an object as second argument, that will have a bunch of action creators
-inside of it. The problem in react-redux says `connect` thinks that an action creator is a function
+The `connect` functione expects an object as second argument, that will have a bunch of action creators
+inside of it. The problem is that react-redux says `connect` thinks that an action creator is a function
 that returns an object and nothing else. In our error we see:
 
 ```
@@ -1022,7 +1023,7 @@ If we compare it to `deleteTodo`:
 (alias) const deleteTodo: (id: number) => DeleteTodoAction
 ```
 
-There's no easy work around for this problem. So for now we can do this:
+Currently there's no easy work around for this problem. So for now we can do this:
 
 ```ts
 interface AppProps {
